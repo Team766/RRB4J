@@ -7,12 +7,16 @@ import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.GpioPinPwmOutput;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
+import com.pi4j.wiringpi.Gpio;
+import com.pi4j.wiringpi.SoftPwm;
 
 public class RRB4J{
 	
-    public static Pin LEFT_GO_PIN = RaspiPin.GPIO_00;
+    //public static Pin LEFT_GO_PIN = RaspiPin.GPIO_00;
+    public static int LEFT_GO_PIN = 0;
     public static Pin LEFT_DIR_PIN = RaspiPin.GPIO_07;
-    public static Pin RIGHT_GO_PIN = RaspiPin.GPIO_12;
+    //public static Pin RIGHT_GO_PIN = RaspiPin.GPIO_12;
+    public static int RIGHT_GO_PIN = 12;
     public static Pin RIGHT_DIR_PIN = RaspiPin.GPIO_06;
     public static Pin SW1_PIN = RaspiPin.GPIO_14;
     public static Pin SW2_PIN = RaspiPin.GPIO_13;
@@ -37,8 +41,8 @@ public class RRB4J{
     GpioPinDigitalOutput left_dir_pin;
     GpioPinDigitalOutput right_dir_pin;   
     
-    public static GpioPinPwmOutput left_pwm;
-    public static GpioPinPwmOutput right_pwm;
+    //GpioPinPwmOutput left_pwm;
+    //GpioPinPwmOutput right_pwm;
     
     final GpioController gpio = GpioFactory.getInstance();
     
@@ -48,9 +52,13 @@ public class RRB4J{
     }
     
     public RRB4J(int revision){
-        left_pwm = gpio.provisionPwmOutputPin(LEFT_GO_PIN, 0);
+        // initialize wiringPi library, this is needed for PWM
+        Gpio.wiringPiSetup();
 
-        right_pwm = gpio.provisionPwmOutputPin(RIGHT_GO_PIN, 0);
+        //left_pwm = gpio.provisionPwmOutputPin(LEFT_GO_PIN, 0);
+        //right_pwm = gpio.provisionPwmOutputPin(RIGHT_GO_PIN, 0);
+        SoftPwm.softPwmCreate(LEFT_GO_PIN, 0, 100);
+        SoftPwm.softPwmCreate(RIGHT_GO_PIN, 0, 100);
 
         if(revision == 1)
             OC2_PIN = OC2_PIN_R1;
@@ -77,12 +85,14 @@ public class RRB4J{
     
     public void setLeftMotor(int left, boolean forward){
     	left_dir_pin.setState(!forward);
-    	left_pwm.setPwm(left);
+    	//left_pwm.setPwm(left);
+    	SoftPwm.softPwmWrite(LEFT_GO_PIN, left);
     }
     
     public void setRightMotor(int right, boolean forward){
     	right_dir_pin.setState(!forward);
-    	right_pwm.setPwm(right);
+    	//right_pwm.setPwm(right);
+    	SoftPwm.softPwmWrite(RIGHT_GO_PIN, right);
     }
     
     public void forward(){
