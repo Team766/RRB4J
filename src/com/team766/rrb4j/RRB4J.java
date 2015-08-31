@@ -1,13 +1,12 @@
 package com.team766.rrb4j;
 
-import com.pi4j.wiringpi.Gpio;
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinAnalogOutput;
+import com.pi4j.io.gpio.GpioPinDigitalInput;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.GpioPinPwmOutput;
 import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 
 public class RRB4J{
@@ -27,20 +26,22 @@ public class RRB4J{
     public static Pin TRIGGER_PIN = RaspiPin.GPIO_18;
     public static Pin ECHO_PIN = RaspiPin.GPIO_23;
     
+    GpioPinDigitalInput sw1_pin;
+    GpioPinDigitalInput sw2_pin;
+    GpioPinDigitalInput echo_pin;
+    
     GpioPinDigitalOutput led1_pin;
     GpioPinDigitalOutput left_go_pin;
-    GpioPinAnalogOutput left_dir_pin;
     GpioPinDigitalOutput right_go_pin;
-    GpioPinAnalogOutput right_dir_pin;   
-    GpioPinDigitalOutput sw1_pin;
-    GpioPinDigitalOutput sw2_pin;
     GpioPinDigitalOutput led2_pin;
     GpioPinDigitalOutput oc1_pin;
     GpioPinDigitalOutput oc2_pin;
     GpioPinDigitalOutput oc2_pin_r1;
     GpioPinDigitalOutput oc2_pin_r2;
     GpioPinDigitalOutput trigger_pin;
-    GpioPinDigitalOutput echo_pin;
+    
+    GpioPinAnalogOutput left_dir_pin;
+    GpioPinAnalogOutput right_dir_pin;   
     
     public static GpioPinPwmOutput left_pwm;
     public static GpioPinPwmOutput right_pwm;
@@ -53,88 +54,81 @@ public class RRB4J{
     }
     
     public RRB4J(int revision){
-        gpio.setMode(PinMode.BCM);
-        gpio.setwarnings(false);
+        left_pwm = gpio.provisionPwmOutputPin(LEFT_GO_PIN, 0);
 
-        Gpio.setup(LEFT_GO_PIN, Gpio.OUT);
-        this.left_pwm = gpio.provisionPwmOutputPin(LEFT_GO_PIN, 500);
-        this.left_pwm.start(0);
-        Gpio.setup(this.LEFT_DIR_PIN, Gpio.OUT);
-        Gpio.setup(this.RIGHT_GO_PIN, Gpio.OUT);
-        this.right_pwm = Gpio.PWM(this.RIGHT_GO_PIN, 500);
-        this.right_pwm.start(0);
-        Gpio.setup(this.RIGHT_DIR_PIN, Gpio.OUT);
+        right_pwm = gpio.provisionPwmOutputPin(RIGHT_GO_PIN, 0);
 
-        Gpio.setup(this.LED1_PIN, Gpio.OUT);
-        Gpio.setup(this.LED2_PIN, Gpio.OUT);
-
-        Gpio.setup(this.OC1_PIN, Gpio.OUT);
         if(revision == 1)
-            this.OC2_PIN = this.OC2_PIN_R1;
+            OC2_PIN = OC2_PIN_R1;
         else
-            this.OC2_PIN = this.OC2_PIN_R2;
-
-        Gpio.setup(this.OC2_PIN_R2, Gpio.OUT);
-
-        Gpio.setup(this.SW1_PIN, Gpio.IN);
-        Gpio.setup(this.SW2_PIN, Gpio.IN);
-        Gpio.setup(this.TRIGGER_PIN, Gpio.OUT);
-        Gpio.setup(this.ECHO_PIN, Gpio.IN);
+            OC2_PIN = OC2_PIN_R2;
         
         led1_pin = gpio.provisionDigitalOutputPin(LED1_PIN);
         left_go_pin = gpio.provisionDigitalOutputPin(LEFT_GO_PIN);
         left_dir_pin = gpio.provisionAnalogOutputPin(LEFT_DIR_PIN);
         right_go_pin = gpio.provisionDigitalOutputPin(RIGHT_GO_PIN);
         right_dir_pin = gpio.provisionAnalogOutputPin(RIGHT_DIR_PIN);   
-        sw1_pin = gpio.provisionDigitalOutputPin(SW1_PIN);
-        sw2_pin = gpio.provisionDigitalOutputPin(SW2_PIN);
+        sw1_pin = gpio.provisionDigitalInputPin(SW1_PIN);
+        sw2_pin = gpio.provisionDigitalInputPin(SW2_PIN);
         led2_pin = gpio.provisionDigitalOutputPin(LED2_PIN);
         oc1_pin = gpio.provisionDigitalOutputPin(OC1_PIN);
         oc2_pin = gpio.provisionDigitalOutputPin(OC2_PIN);
         oc2_pin_r1 = gpio.provisionDigitalOutputPin(OC2_PIN_R1);
         oc2_pin_r2 = gpio.provisionDigitalOutputPin(OC2_PIN_R2);
         trigger_pin = gpio.provisionDigitalOutputPin(TRIGGER_PIN);
-        echo_pin = gpio.provisionDigitalOutputPin(ECHO_PIN);
+        echo_pin = gpio.provisionDigitalInputPin(ECHO_PIN);
     }
-
-
-
-    public void set_motors(double left_go, double left_dir, double right_go, double right_dir){
-        left_pwm.ChangeDutyCycle(left_go * 100);
-        left_dir_pin.setValue(left_dir);
-        this.right_pwm.ChangeDutyCycle(right_go * 100);
-        right_dir_pin.setValue(right_dir);
+    
+    public void set_motors(double left, double right){
+        setLeftMotor(left);
+        setRightMotor(right);
+    }
+    
+    public void setLeftMotor(double left){
+        left_dir_pin.setValue(left);
+    }
+    
+    public void setRightMotor(double right){
+        right_dir_pin.setValue(right);
     }
     
     public void forward(){
     	forward(0,0.5);
     }
     
+    public void forward(double speed){
+    	forward(0,speed);
+    }
+    
     public void forward(int seconds, double speed){
-        set_motors(speed, 0d, speed, 0d);
+        set_motors(speed, speed);
         if(seconds > 0){
         	try{
                 Thread.sleep(seconds * 1000);
             }catch(InterruptedException e){}
-            this.stop();
+            stop();
         }
      }
 
     public void stop(){
-        set_motors(0d, 0d, 0d, 0d);
+        set_motors(0d, 0d);
     }
     
     public void reverse(){
     	reverse(0,0.5);
     }
+    
+    public void reverse(int speed){
+    	reverse(0,speed);
+    }
  
     public void reverse(int seconds, double speed){
-        this.set_motors(speed, 1, speed, 1);
+        set_motors(speed, speed);
         if(seconds > 0){
         	try{
                 Thread.sleep(seconds * 1000);
             }catch(InterruptedException e){}
-            this.stop();
+            stop();
         }
     }
     
@@ -143,12 +137,12 @@ public class RRB4J{
     }
     
     public void left(int seconds, double speed){
-        this.set_motors(speed, 0, speed, 1);
+        set_motors(0, speed);
         if(seconds > 0){
         	try{
                 Thread.sleep(seconds * 1000);
             }catch(InterruptedException e){}
-            this.stop();
+            stop();
         }
     }
     
@@ -157,60 +151,59 @@ public class RRB4J{
     }
 
     public void right(int seconds, double speed){
-        this.set_motors(speed, 1d, speed, 0d);
+        set_motors(speed, 0d);
         if(seconds > 0){
         	try{
             Thread.sleep(seconds * 1000);
         	}catch(InterruptedException e){}
-            this.stop();
+            stop();
         }
     }
 
     public boolean sw1_closed(){
-        return Gpio.digitalRead(SW1_PIN) == 0;
+        return sw1_pin.isLow();
     }
 
     public boolean sw2_closed(){
-        return Gpio.digitalRead(SW2_PIN) == 0;
+    	return sw2_pin.isLow();
     }
 
     public void set_led1(boolean state){
-        Gpio.digitalWrite(LED1_PIN, state);
+        led1_pin.setState(state);
     }
 
     public void set_led2(boolean state){
-        Gpio.digitalWrite(LED2_PIN, state);
+    	led2_pin.setState(state);
     }
 
     public void set_oc1(boolean state){
-        Gpio.digitalWrite(OC1_PIN, state);
+        oc1_pin.setState(state);
     }
     public void set_oc2(boolean state){
-        Gpio.digitalWrite(OC2_PIN, state);    
+    	oc2_pin.setState(state);
     }
 
     private void _send_trigger_pulse(){
-        Gpio.digitalWrite(TRIGGER_PIN, true);
+        trigger_pin.setState(true);
         try{
             Thread.sleep(0, 100000);
-        	}catch(InterruptedException e){}
-        Gpio.digitalWrite(TRIGGER_PIN, false);
+        }catch(InterruptedException e){}
+        
+        trigger_pin.setState(false);
 	}
 
-    private void _wait_for_echo(int value, int timeout){
+    private void _wait_for_echo(boolean high, int timeout){
         int count = timeout;
-        while(Gpio.digitalRead(ECHO_PIN) != value && count > 0)
+        while(echo_pin.isHigh() != high && count > 0)
             count--;
     }
 
     public float get_distance(){
-        this._send_trigger_pulse();
-        this._wait_for_echo(1, 10000);
+        _send_trigger_pulse();
+        _wait_for_echo(true, 10000);
         float start = System.nanoTime() * 1e-9f;
-        this._wait_for_echo(0, 10000);
+        _wait_for_echo(false, 10000);
         float finish = System.nanoTime() * 1e-9f;
-        float pulse_len = finish - start;
-        float distance_cm = pulse_len / 0.000058f;
-        return distance_cm;
+        return (finish - start) / 0.000058f;
     }
 }
