@@ -78,16 +78,18 @@ public class RRB4J{
         echo_pin = gpio.provisionDigitalInputPin(ECHO_PIN);
     }
     
-    public void set_motors(int left, int right){
-        setLeftMotor(left);
-        setRightMotor(right);
+    public void set_motors(int left, boolean lForward, int right, boolean rForward){
+        setLeftMotor(left, lForward);
+        setRightMotor(right, rForward);
     }
     
-    public void setLeftMotor(int left){
+    public void setLeftMotor(int left, boolean forward){
+    	left_dir_pin.setState(!forward);
     	left_pwm.setPwm(left);
     }
     
-    public void setRightMotor(int right){
+    public void setRightMotor(int right, boolean forward){
+    	right_dir_pin.setState(!forward);
     	right_pwm.setPwm(right);
     }
     
@@ -100,7 +102,7 @@ public class RRB4J{
     }
     
     public void forward(int seconds, int speed){
-        set_motors(speed, speed);
+        set_motors(speed, true, speed, true);
         if(seconds > 0){
         	try{
                 Thread.sleep(seconds * 1000);
@@ -110,7 +112,7 @@ public class RRB4J{
      }
 
     public void stop(){
-        set_motors(0, 0);
+        set_motors(0, true, 0, true);
     }
     
     public void reverse(){
@@ -122,7 +124,7 @@ public class RRB4J{
     }
  
     public void reverse(int seconds, int speed){
-        set_motors(speed, speed);
+        set_motors(speed, true, speed, true);
         if(seconds > 0){
         	try{
                 Thread.sleep(seconds * 1000);
@@ -136,7 +138,7 @@ public class RRB4J{
     }
     
     public void left(int seconds, int speed){
-        set_motors(0, speed);
+        set_motors(0, false, speed, true);
         if(seconds > 0){
         	try{
                 Thread.sleep(seconds * 1000);
@@ -150,7 +152,7 @@ public class RRB4J{
     }
 
     public void right(int seconds, int speed){
-        set_motors(speed, 0);
+        set_motors(speed, true, 0, false);
         if(seconds > 0){
         	try{
             Thread.sleep(seconds * 1000);
