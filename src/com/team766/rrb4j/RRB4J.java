@@ -10,33 +10,29 @@ import com.pi4j.io.gpio.RaspiPin;
 
 public class RRB4J{
 	
-    public static Pin LEFT_GO_PIN = RaspiPin.GPIO_17;
-    public static Pin LEFT_DIR_PIN = RaspiPin.GPIO_04;
-    public static Pin RIGHT_GO_PIN = RaspiPin.GPIO_10;
-    public static Pin RIGHT_DIR_PIN = RaspiPin.GPIO_25;   
-    public static Pin SW1_PIN = RaspiPin.GPIO_11;
-    public static Pin SW2_PIN = RaspiPin.GPIO_09;
-    public static Pin LED1_PIN = RaspiPin.GPIO_07;
-    public static Pin LED2_PIN = RaspiPin.GPIO_08;
-    public static Pin OC1_PIN = RaspiPin.GPIO_22;
-    public static Pin OC2_PIN = RaspiPin.GPIO_27;
-    public static Pin OC2_PIN_R1 = RaspiPin.GPIO_21;
-    public static Pin OC2_PIN_R2 = RaspiPin.GPIO_27;
-    public static Pin TRIGGER_PIN = RaspiPin.GPIO_18;
-    public static Pin ECHO_PIN = RaspiPin.GPIO_23;
+    public static Pin LEFT_GO_PIN = RaspiPin.GPIO_00;
+    public static Pin LEFT_DIR_PIN = RaspiPin.GPIO_07;
+    public static Pin RIGHT_GO_PIN = RaspiPin.GPIO_12;
+    public static Pin RIGHT_DIR_PIN = RaspiPin.GPIO_06;
+    public static Pin SW1_PIN = RaspiPin.GPIO_14;
+    public static Pin SW2_PIN = RaspiPin.GPIO_13;
+    public static Pin LED1_PIN = RaspiPin.GPIO_11;
+    public static Pin LED2_PIN = RaspiPin.GPIO_10;
+    public static Pin OC1_PIN = RaspiPin.GPIO_03;
+    public static Pin OC2_PIN = RaspiPin.GPIO_02;
+    public static Pin OC2_PIN_R1 = RaspiPin.GPIO_29;
+    public static Pin OC2_PIN_R2 = RaspiPin.GPIO_02;
+    public static Pin TRIGGER_PIN = RaspiPin.GPIO_01;
+    public static Pin ECHO_PIN = RaspiPin.GPIO_04;
     
     GpioPinDigitalInput sw1_pin;
     GpioPinDigitalInput sw2_pin;
     GpioPinDigitalInput echo_pin;
     
     GpioPinDigitalOutput led1_pin;
-    GpioPinDigitalOutput left_go_pin;
-    GpioPinDigitalOutput right_go_pin;
     GpioPinDigitalOutput led2_pin;
     GpioPinDigitalOutput oc1_pin;
     GpioPinDigitalOutput oc2_pin;
-    GpioPinDigitalOutput oc2_pin_r1;
-    GpioPinDigitalOutput oc2_pin_r2;
     GpioPinDigitalOutput trigger_pin;
     GpioPinDigitalOutput left_dir_pin;
     GpioPinDigitalOutput right_dir_pin;   
@@ -62,15 +58,11 @@ public class RRB4J{
             OC2_PIN = OC2_PIN_R2;
         
         led1_pin = gpio.provisionDigitalOutputPin(LED1_PIN);
-        left_go_pin = gpio.provisionDigitalOutputPin(LEFT_GO_PIN);
         left_dir_pin = gpio.provisionDigitalOutputPin(LEFT_DIR_PIN);
-        right_go_pin = gpio.provisionDigitalOutputPin(RIGHT_GO_PIN);
         right_dir_pin = gpio.provisionDigitalOutputPin(RIGHT_DIR_PIN);   
         led2_pin = gpio.provisionDigitalOutputPin(LED2_PIN);
         oc1_pin = gpio.provisionDigitalOutputPin(OC1_PIN);
         oc2_pin = gpio.provisionDigitalOutputPin(OC2_PIN);
-        oc2_pin_r1 = gpio.provisionDigitalOutputPin(OC2_PIN_R1);
-        oc2_pin_r2 = gpio.provisionDigitalOutputPin(OC2_PIN_R2);
         trigger_pin = gpio.provisionDigitalOutputPin(TRIGGER_PIN);
         
         sw1_pin = gpio.provisionDigitalInputPin(SW1_PIN);
