@@ -11,7 +11,7 @@ import com.pi4j.wiringpi.Gpio;
 import com.pi4j.wiringpi.SoftPwm;
 
 public class RRB4J{
-	
+    
     //public static Pin LEFT_GO_PIN = RaspiPin.GPIO_00;
     public static int LEFT_GO_PIN = 0;
     public static Pin LEFT_DIR_PIN = RaspiPin.GPIO_07;
@@ -47,8 +47,8 @@ public class RRB4J{
     final GpioController gpio = GpioFactory.getInstance();
     
     public RRB4J(){
-    	this(2);
-    	
+        this(2);
+        
     }
     
     public RRB4J(int revision){
@@ -84,29 +84,29 @@ public class RRB4J{
     }
     
     public void setLeftMotor(int left, boolean forward){
-    	left_dir_pin.setState(!forward);
-    	//left_pwm.setPwm(left);
-    	SoftPwm.softPwmWrite(LEFT_GO_PIN, left);
+        left_dir_pin.setState(!forward);
+        //left_pwm.setPwm(left);
+        SoftPwm.softPwmWrite(LEFT_GO_PIN, left);
     }
     
     public void setRightMotor(int right, boolean forward){
-    	right_dir_pin.setState(!forward);
-    	//right_pwm.setPwm(right);
-    	SoftPwm.softPwmWrite(RIGHT_GO_PIN, right);
+        right_dir_pin.setState(!forward);
+        //right_pwm.setPwm(right);
+        SoftPwm.softPwmWrite(RIGHT_GO_PIN, right);
     }
     
     public void forward(){
-    	forward(0,50);
+        forward(0,50);
     }
     
     public void forward(int speed){
-    	forward(0,speed);
+        forward(0,speed);
     }
     
     public void forward(int seconds, int speed){
         set_motors(speed, true, speed, true);
         if(seconds > 0){
-        	try{
+            try{
                 Thread.sleep(seconds * 1000);
             }catch(InterruptedException e){}
             stop();
@@ -118,17 +118,17 @@ public class RRB4J{
     }
     
     public void reverse(){
-    	reverse(0,50);
+        reverse(0,50);
     }
     
     public void reverse(int speed){
-    	reverse(0,speed);
+        reverse(0,speed);
     }
  
     public void reverse(int seconds, int speed){
         set_motors(speed, true, speed, true);
         if(seconds > 0){
-        	try{
+            try{
                 Thread.sleep(seconds * 1000);
             }catch(InterruptedException e){}
             stop();
@@ -136,13 +136,13 @@ public class RRB4J{
     }
     
     public void left(){
-    	left(0, 50);
+        left(0, 50);
     }
     
     public void left(int seconds, int speed){
         set_motors(0, false, speed, true);
         if(seconds > 0){
-        	try{
+            try{
                 Thread.sleep(seconds * 1000);
             }catch(InterruptedException e){}
             stop();
@@ -150,15 +150,15 @@ public class RRB4J{
     }
     
     public void right(){
-    	right(0, 50);
+        right(0, 50);
     }
 
     public void right(int seconds, int speed){
         set_motors(speed, true, 0, false);
         if(seconds > 0){
-        	try{
-            Thread.sleep(seconds * 1000);
-        	}catch(InterruptedException e){}
+            try{
+                Thread.sleep(seconds * 1000);
+            }catch(InterruptedException e){}
             stop();
         }
     }
@@ -168,7 +168,7 @@ public class RRB4J{
     }
 
     public boolean sw2_closed(){
-    	return sw2_pin.isLow();
+        return sw2_pin.isLow();
     }
 
     public void set_led1(boolean state){
@@ -176,14 +176,14 @@ public class RRB4J{
     }
 
     public void set_led2(boolean state){
-    	led2_pin.setState(state);
+        led2_pin.setState(state);
     }
 
     public void set_oc1(boolean state){
         oc1_pin.setState(state);
     }
     public void set_oc2(boolean state){
-    	oc2_pin.setState(state);
+        oc2_pin.setState(state);
     }
 
     private void _send_trigger_pulse(){
@@ -193,7 +193,7 @@ public class RRB4J{
         }catch(InterruptedException e){}
         
         trigger_pin.setState(false);
-	}
+    }
 
     private void _wait_for_echo(boolean high, int timeout){
         int count = timeout;
