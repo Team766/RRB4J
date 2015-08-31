@@ -126,7 +126,7 @@ public class RRB4J{
     }
  
     public void reverse(int seconds, int speed){
-        set_motors(speed, true, speed, true);
+        set_motors(speed, false, speed, false);
         if(seconds > 0){
             try{
                 Thread.sleep(seconds * 1000);
