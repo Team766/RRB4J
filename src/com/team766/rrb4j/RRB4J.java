@@ -2,7 +2,6 @@ package com.team766.rrb4j;
 
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinAnalogOutput;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.GpioPinPwmOutput;
@@ -39,9 +38,8 @@ public class RRB4J{
     GpioPinDigitalOutput oc2_pin_r1;
     GpioPinDigitalOutput oc2_pin_r2;
     GpioPinDigitalOutput trigger_pin;
-    
-    GpioPinAnalogOutput left_dir_pin;
-    GpioPinAnalogOutput right_dir_pin;   
+    GpioPinDigitalOutput left_dir_pin;
+    GpioPinDigitalOutput right_dir_pin;   
     
     public static GpioPinPwmOutput left_pwm;
     public static GpioPinPwmOutput right_pwm;
@@ -65,42 +63,43 @@ public class RRB4J{
         
         led1_pin = gpio.provisionDigitalOutputPin(LED1_PIN);
         left_go_pin = gpio.provisionDigitalOutputPin(LEFT_GO_PIN);
-        left_dir_pin = gpio.provisionAnalogOutputPin(LEFT_DIR_PIN);
+        left_dir_pin = gpio.provisionDigitalOutputPin(LEFT_DIR_PIN);
         right_go_pin = gpio.provisionDigitalOutputPin(RIGHT_GO_PIN);
-        right_dir_pin = gpio.provisionAnalogOutputPin(RIGHT_DIR_PIN);   
-        sw1_pin = gpio.provisionDigitalInputPin(SW1_PIN);
-        sw2_pin = gpio.provisionDigitalInputPin(SW2_PIN);
+        right_dir_pin = gpio.provisionDigitalOutputPin(RIGHT_DIR_PIN);   
         led2_pin = gpio.provisionDigitalOutputPin(LED2_PIN);
         oc1_pin = gpio.provisionDigitalOutputPin(OC1_PIN);
         oc2_pin = gpio.provisionDigitalOutputPin(OC2_PIN);
         oc2_pin_r1 = gpio.provisionDigitalOutputPin(OC2_PIN_R1);
         oc2_pin_r2 = gpio.provisionDigitalOutputPin(OC2_PIN_R2);
         trigger_pin = gpio.provisionDigitalOutputPin(TRIGGER_PIN);
+        
+        sw1_pin = gpio.provisionDigitalInputPin(SW1_PIN);
+        sw2_pin = gpio.provisionDigitalInputPin(SW2_PIN);
         echo_pin = gpio.provisionDigitalInputPin(ECHO_PIN);
     }
     
-    public void set_motors(double left, double right){
+    public void set_motors(int left, int right){
         setLeftMotor(left);
         setRightMotor(right);
     }
     
-    public void setLeftMotor(double left){
-        left_dir_pin.setValue(left);
+    public void setLeftMotor(int left){
+    	left_pwm.setPwm(left);
     }
     
-    public void setRightMotor(double right){
-        right_dir_pin.setValue(right);
+    public void setRightMotor(int right){
+    	right_pwm.setPwm(right);
     }
     
     public void forward(){
-    	forward(0,0.5);
+    	forward(0,50);
     }
     
-    public void forward(double speed){
+    public void forward(int speed){
     	forward(0,speed);
     }
     
-    public void forward(int seconds, double speed){
+    public void forward(int seconds, int speed){
         set_motors(speed, speed);
         if(seconds > 0){
         	try{
@@ -111,18 +110,18 @@ public class RRB4J{
      }
 
     public void stop(){
-        set_motors(0d, 0d);
+        set_motors(0, 0);
     }
     
     public void reverse(){
-    	reverse(0,0.5);
+    	reverse(0,50);
     }
     
     public void reverse(int speed){
     	reverse(0,speed);
     }
  
-    public void reverse(int seconds, double speed){
+    public void reverse(int seconds, int speed){
         set_motors(speed, speed);
         if(seconds > 0){
         	try{
@@ -133,10 +132,10 @@ public class RRB4J{
     }
     
     public void left(){
-    	left(0, 0.5);
+    	left(0, 50);
     }
     
-    public void left(int seconds, double speed){
+    public void left(int seconds, int speed){
         set_motors(0, speed);
         if(seconds > 0){
         	try{
@@ -147,11 +146,11 @@ public class RRB4J{
     }
     
     public void right(){
-    	right(0, 0.5);
+    	right(0, 50);
     }
 
-    public void right(int seconds, double speed){
-        set_motors(speed, 0d);
+    public void right(int seconds, int speed){
+        set_motors(speed, 0);
         if(seconds > 0){
         	try{
             Thread.sleep(seconds * 1000);
