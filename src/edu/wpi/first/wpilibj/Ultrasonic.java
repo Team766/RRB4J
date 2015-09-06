@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import com.team766.rrb4j.RRB4J;
+
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.Timer;
@@ -37,6 +39,8 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
 		public final int value;
 		static final int kInches_val = 0;
 		static final int kMillimeters_val = 1;
+		static final float kInchesToCM = 0.393701f;
+		
 		/**
 		 * Use inches for PIDGet
 		 */
@@ -343,8 +347,8 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
 	 *         measurement hasn't completed, then return 0.
 	 */
 	public double getRangeInches() {
-		if (isRangeValid()) {
-			return m_counter.getPeriod() * kSpeedOfSoundInchesPerSec / 2.0;
+		if (m_pingChannel.getChannel() == 0 && m_echoChannel.getChannel() == 1) {
+			return (double)(RRB4J.getInstance().get_distance() * Unit.kInchesToCM);
 		} else {
 			return 0;
 		}

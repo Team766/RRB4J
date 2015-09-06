@@ -4,14 +4,15 @@ import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import com.pi4j.io.gpio.GpioPinPwmOutput;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.wiringpi.Gpio;
 import com.pi4j.wiringpi.SoftPwm;
 
 public class RRB4J{
-    
+	private static RRB4J instance_;
+	
+	
     //public static Pin LEFT_GO_PIN = RaspiPin.GPIO_00;
     public static int LEFT_GO_PIN = 0;
     public static Pin LEFT_DIR_PIN = RaspiPin.GPIO_07;
@@ -46,9 +47,14 @@ public class RRB4J{
     
     final GpioController gpio = GpioFactory.getInstance();
     
+    public static RRB4J getInstance() {
+		if (instance_ == null)
+			instance_ = new RRB4J();
+		return instance_;
+	}
+    
     public RRB4J(){
         this(2);
-        
     }
     
     public RRB4J(int revision){
