@@ -10,6 +10,8 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteOrder;
 import java.nio.ByteBuffer;
 
+import com.team766.rrb4j.RRB4J;
+
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.PWMJNI;
@@ -112,28 +114,28 @@ public class PWM extends SensorBase implements LiveWindowSendable {
 	 * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
 	 */
 	private void initPWM(final int channel) {
-		checkPWMChannel(channel);
+//		checkPWMChannel(channel);
 		m_channel = channel;
 
-		ByteBuffer status = ByteBuffer.allocateDirect(4);
-		status.order(ByteOrder.LITTLE_ENDIAN);
-
-		m_port = DIOJNI.initializeDigitalPort(DIOJNI.getPort((byte) m_channel), status.asIntBuffer());
-		HALUtil.checkStatus(status.asIntBuffer());
-
-		if (!PWMJNI.allocatePWMChannel(m_port, status.asIntBuffer()))
-		{
-			throw new AllocationException(
-				"PWM channel " + channel  + " is already allocated");
-		}
-		HALUtil.checkStatus(status.asIntBuffer());
-
-		PWMJNI.setPWM(m_port, (short) 0, status.asIntBuffer());
-		HALUtil.checkStatus(status.asIntBuffer());
-
-		m_eliminateDeadband = false;
-
-		UsageReporting.report(tResourceType.kResourceType_PWM, channel);
+//		ByteBuffer status = ByteBuffer.allocateDirect(4);
+//		status.order(ByteOrder.LITTLE_ENDIAN);
+//
+//		m_port = DIOJNI.initializeDigitalPort(DIOJNI.getPort((byte) m_channel), status.asIntBuffer());
+//		HALUtil.checkStatus(status.asIntBuffer());
+//
+//		if (!PWMJNI.allocatePWMChannel(m_port, status.asIntBuffer()))
+//		{
+//			throw new AllocationException(
+//				"PWM channel " + channel  + " is already allocated");
+//		}
+//		HALUtil.checkStatus(status.asIntBuffer());
+//
+//		PWMJNI.setPWM(m_port, (short) 0, status.asIntBuffer());
+//		HALUtil.checkStatus(status.asIntBuffer());
+//
+//		m_eliminateDeadband = false;
+//
+//		UsageReporting.report(tResourceType.kResourceType_PWM, channel);
 	}
 
 	/**
@@ -242,12 +244,22 @@ public class PWM extends SensorBase implements LiveWindowSendable {
 			pos = 1.0;
 		}
 
-		int rawValue;
-		// note, need to perform the multiplication below as floating point before converting to int
-		rawValue = (int) ((pos * (double)getFullRangeScaleFactor()) + getMinNegativePwm());
-
-		// send the computed pwm value to the FPGA
-		setRaw(rawValue);
+		//Turn -1 - 1 into 0 - 100
+		
+		if(getChannel() == 0)
+			RRB4J.getInstance().setLeftMotor((int)(pos * 100d), pos < 0);
+		else if(getChannel() == 1)
+			RRB4J.getInstance().setRightMotor((int)(pos * 100d), pos < 0);
+		else
+			System.err.println("WRONG TALON PORT,  silly");
+		
+		
+//		int rawValue;
+//		// note, need to perform the multiplication below as floating point before converting to int
+//		rawValue = (int) ((pos * (double)getFullRangeScaleFactor()) + getMinNegativePwm());
+//
+//		// send the computed pwm value to the FPGA
+//		setRaw(rawValue);
 	}
 
 	/**
@@ -285,27 +297,20 @@ public class PWM extends SensorBase implements LiveWindowSendable {
 	 * @param speed The speed to set the speed controller between -1.0 and 1.0.
 	 */
 	final void setSpeed(double speed) {
-		// clamp speed to be in the range 1.0 >= speed >= -1.0
 		if (speed < -1.0) {
 			speed = -1.0;
 		} else if (speed > 1.0) {
 			speed = 1.0;
 		}
 
-		// calculate the desired output pwm value by scaling the speed appropriately
-		int rawValue;
-		if (speed == 0.0) {
-			rawValue = getCenterPwm();
-		} else if (speed > 0.0) {
-			rawValue = (int) (speed * ((double)getPositiveScaleFactor()) +
-							  ((double)getMinPositivePwm()) + 0.5);
-		} else {
-			rawValue = (int) (speed * ((double)getNegativeScaleFactor()) +
-							  ((double)getMaxNegativePwm()) + 0.5);
-		}
-
-		// send the computed pwm value to the FPGA
-		setRaw(rawValue);
+		//Turn -1 - 1 into 0 - 100
+		
+		if(getChannel() == 0)
+			RRB4J.getInstance().setLeftMotor(Math.abs((int)(speed * 100d)), speed < 0);
+		else if(getChannel() == 1)
+			RRB4J.getInstance().setRightMotor(Math.abs((int)(speed * 100d)), speed < 0);
+		else
+			System.err.println("WRONG TALON PORT,  silly");
 	}
 
 	/**

@@ -32,6 +32,7 @@ public class SampleRobot extends RobotBase {
      */
     public SampleRobot() {
         super();
+        RobotBase.fileName = this.getClass().getSimpleName();
         m_robotMainOverridden = true;
     }
 
@@ -122,31 +123,31 @@ public class SampleRobot extends RobotBase {
 
             while (true) {
                 if (isDisabled()) {
-                    m_ds.InDisabled(true);
+//                    m_ds.InDisabled(true);
                     disabled();
-                    m_ds.InDisabled(false);
+//                    m_ds.InDisabled(false);
                     while (isDisabled()) {
                         Timer.delay(0.01);
                     }
                 } else if (isAutonomous()) {
-                    m_ds.InAutonomous(true);
+//                    m_ds.InAutonomous(true);
                     autonomous();
-                    m_ds.InAutonomous(false);
+//                    m_ds.InAutonomous(false);
                     while (isAutonomous() && !isDisabled()) {
                         Timer.delay(0.01);
                     }
                 } else if (isTest()) {
                     LiveWindow.setEnabled(true);
-                    m_ds.InTest(true);
+//                    m_ds.InTest(true);
                     test();
-                    m_ds.InTest(false);
+//                    m_ds.InTest(false);
                     while (isTest() && isEnabled())
                         Timer.delay(0.01);
                     LiveWindow.setEnabled(false);
                 } else {
-                    m_ds.InOperatorControl(true);
+//                    m_ds.InOperatorControl(true);
                     operatorControl();
-                    m_ds.InOperatorControl(false);
+//                    m_ds.InOperatorControl(false);
                     while (isOperatorControl() && !isDisabled()) {
                         Timer.delay(0.01);
                     }

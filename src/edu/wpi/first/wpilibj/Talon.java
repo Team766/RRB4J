@@ -47,7 +47,7 @@ public class Talon extends SafePWM implements SpeedController {
      */
     public Talon(final int channel) {
         super(channel);
-        initTalon();
+//        initTalon();
     }
 
     /**
@@ -76,7 +76,7 @@ public class Talon extends SafePWM implements SpeedController {
      */
     public void set(double speed) {
         setSpeed(speed);
-        Feed();
+        //Feed();
     }
 
     /**

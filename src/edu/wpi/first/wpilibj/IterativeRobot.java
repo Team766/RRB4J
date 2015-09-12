@@ -150,7 +150,7 @@ public class IterativeRobot extends RobotBase {
                     teleopPeriodic();
                 }
             }
-            m_ds.waitForData();
+//            m_ds.waitForData();
         }
     }
 
@@ -159,7 +159,7 @@ public class IterativeRobot extends RobotBase {
      * Call the periodic functions whenever a packet is received from the Driver Station, or about every 20ms.
      */
     private boolean nextPeriodReady() {
-        return m_ds.isNewControlData();
+        return true;
     }
 
     /* ----------- Overridable initialization code -----------------*/

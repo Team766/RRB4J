@@ -31,7 +31,7 @@ public class SafePWM extends PWM implements MotorSafety {
      */
     public SafePWM(final int channel) {
         super(channel);
-        initSafePWM();
+//        initSafePWM();
     }
 
     /*

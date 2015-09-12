@@ -17,6 +17,9 @@ import java.util.Enumeration;
 import java.util.jar.Manifest;
 import java.util.Arrays;
 
+import com.team766.rrb4j.RRB4J;
+import com.team766.rrb4j.Robot;
+
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
@@ -39,8 +42,13 @@ public abstract class RobotBase {
 	 * The VxWorks priority that robot code should work at (so Java code should run at)
 	 */
 	public static final int ROBOT_TASK_PRIORITY = 101;
+	public static String fileName = "Robot.java";
+	
+	public enum RobotState {
+        DISABLED, AUTONOMOUS, INIT, TELEOP
+    }
 
-	protected final DriverStation m_ds;
+//	protected final DriverStation m_ds;
 
 	/**
 	 * Constructor for a generic robot program.
@@ -49,17 +57,17 @@ public abstract class RobotBase {
 	 *
 	 * This must be used to ensure that the communications code starts. In the future it would be
 	 * nice to put this code into it's own task that loads on boot so ensure that it runs.
-	 */
-	protected RobotBase() {
-		// TODO: StartCAPI();
-		// TODO: See if the next line is necessary
-		// Resource.RestartProgram();
-
-		NetworkTable.setServerMode();//must be before b
-		m_ds = DriverStation.getInstance();
-		NetworkTable.getTable("");  // forces network tables to initialize
-		NetworkTable.getTable("LiveWindow").getSubTable("~STATUS~").putBoolean("LW Enabled", false);
-	}
+//	 */
+//	protected RobotBase() {
+//		// TODO: StartCAPI();
+//		// TODO: See if the next line is necessary
+//		// Resource.RestartProgram();
+//
+//		NetworkTable.setServerMode();//must be before b
+//		m_ds = DriverStation.getInstance();
+//		NetworkTable.getTable("");  // forces network tables to initialize
+//		NetworkTable.getTable("LiveWindow").getSubTable("~STATUS~").putBoolean("LW Enabled", false);
+//	}
 
 	/**
 	 * Free the resources for a RobotBase class.
@@ -86,7 +94,7 @@ public abstract class RobotBase {
 	 * @return True if the Robot is currently disabled by the field controls.
 	 */
 	public boolean isDisabled() {
-		return m_ds.isDisabled();
+		return false;
 	}
 
 	/**
@@ -94,7 +102,7 @@ public abstract class RobotBase {
 	 * @return True if the Robot is currently enabled by the field controls.
 	 */
 	public boolean isEnabled() {
-		return m_ds.isEnabled();
+		return true;
 	}
 
 	/**
@@ -102,7 +110,7 @@ public abstract class RobotBase {
 	 * @return True if the robot is currently operating Autonomously as determined by the field controls.
 	 */
 	public boolean isAutonomous() {
-		return m_ds.isAutonomous();
+		return false;
 	}
 
 	/**
@@ -110,7 +118,7 @@ public abstract class RobotBase {
 	 * @return True if the robot is currently operating in Test mode as determined by the driver station.
 	 */
 	public boolean isTest() {
-		return m_ds.isTest();
+		return false;
 	}
 
 	/**
@@ -118,7 +126,7 @@ public abstract class RobotBase {
 	 * @return True if the robot is currently operating in Tele-Op mode as determined by the field controls.
 	 */
 	public boolean isOperatorControl() {
-		return m_ds.isOperatorControl();
+		return true;
 	}
 
 	/**
@@ -126,7 +134,7 @@ public abstract class RobotBase {
 	 * @return Has new data arrived over the network since the last time this function was called?
 	 */
 	public boolean isNewDataAvailable() {
-		return m_ds.isNewControlData();
+		return true;
 	}
 
 	/**
@@ -169,81 +177,113 @@ public abstract class RobotBase {
 		// Set some implementations so that the static methods work properly
 		Timer.SetImplementation(new HardwareTimer());
 		HLUsageReporting.SetImplementation(new HardwareHLUsageReporting());
-		RobotState.SetImplementation(DriverStation.getInstance());
+//		RobotState.SetImplementation(DriverStation.getInstance());
 	}
-
+    
 	/**
 	 * Starting point for the applications.
 	 */
-	public static void main(String args[]) {
-		initializeHardwareConfiguration();
-
-		UsageReporting.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
-
-		String robotName = "";
-		Enumeration<URL> resources = null;
-		try {
-			resources = RobotBase.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
-		} catch (IOException e) {e.printStackTrace();}
-		while (resources != null && resources.hasMoreElements()) {
-			try {
-				Manifest manifest = new Manifest(resources.nextElement().openStream());
-				robotName = manifest.getMainAttributes().getValue("Robot-Class");
-			} catch (IOException e) {e.printStackTrace();}
-		}
-
-		RobotBase robot;
-		try {
-			robot = (RobotBase) Class.forName(robotName).newInstance();
-			robot.prestart();
-		} catch (Throwable t) {
-			DriverStation.reportError("ERROR Unhandled exception instantiating robot " + robotName + " " + t.toString() + " at " + Arrays.toString(t.getStackTrace()), false);
-			System.err.println("WARNING: Robots don't quit!");
-			System.err.println("ERROR: Could not instantiate robot " + robotName + "!");
-			System.exit(1);
-			return;
-		}
+	public static void main(String args[]){
+		RRB4J.getInstance().set_led1(true);
+		Robot robert = new Robot();
 		
-		File file = null;
-            FileOutputStream output = null;
-            try {
-                file = new File("/tmp/frc_versions/FRC_Lib_Version.ini");
-
-                if (file.exists())
-                	file.delete();
-
-                file.createNewFile();
-
-                output = new FileOutputStream(file);
-
-				output.write("2015 Java 1.0.0".getBytes());
-
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            } finally {
-                if (output != null) {
-                    try {
-                        output.close();
-                    } catch (IOException ex) {
-                    }
-                }
-            }
-
-		boolean errorOnExit = false;
-		try {
-			robot.startCompetition();
-		} catch (Throwable t) {
-			DriverStation.reportError("ERROR Unhandled exception: " + t.toString() + " at " + Arrays.toString(t.getStackTrace()), false);
-			errorOnExit = true;
-		} finally {
-			// startCompetition never returns unless exception occurs....
-			System.err.println("WARNING: Robots don't quit!");
-			if (errorOnExit) {
-				System.err.println("---> The startCompetition() method (or methods called by it) should have handled the exception above.");
-			} else {
-				System.err.println("---> Unexpected return from startCompetition() method.");
+		System.out.println(fileName);
+		
+		RobotState _state = RobotState.INIT;
+		for(int i = 0; i < RobotState.values().length; i++){
+			switch(_state){
+				case AUTONOMOUS:
+					robert.autonomous();
+					_state = RobotState.TELEOP;
+					break;
+				case DISABLED:
+					robert.disabled();
+					_state = RobotState.AUTONOMOUS;
+					break;
+				case INIT:
+					robert.robotInit();
+					_state = RobotState.DISABLED;
+					break;
+				case TELEOP:
+					robert.operatorControl();
+					_state = RobotState.DISABLED;
+					break;
+				default:
+					break;
 			}
 		}
-		System.exit(1);
+		RRB4J.getInstance().set_led1(false);
 	}
+	
+//	public static void main(String args[]) {
+//		initializeHardwareConfiguration();
+//
+//		UsageReporting.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
+//
+//		String robotName = "";
+//		Enumeration<URL> resources = null;
+//		try {
+//			resources = RobotBase.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+//		} catch (IOException e) {e.printStackTrace();}
+//		while (resources != null && resources.hasMoreElements()) {
+//			try {
+//				Manifest manifest = new Manifest(resources.nextElement().openStream());
+//				robotName = manifest.getMainAttributes().getValue("Robot-Class");
+//			} catch (IOException e) {e.printStackTrace();}
+//		}
+//
+//		RobotBase robot;
+//		try {
+//			robot = (RobotBase) Class.forName(robotName).newInstance();
+//			robot.prestart();
+//		} catch (Throwable t) {
+//			DriverStation.reportError("ERROR Unhandled exception instantiating robot " + robotName + " " + t.toString() + " at " + Arrays.toString(t.getStackTrace()), false);
+//			System.err.println("WARNING: Robots don't quit!");
+//			System.err.println("ERROR: Could not instantiate robot " + robotName + "!");
+//			System.exit(1);
+//			return;
+//		}
+//		
+//		File file = null;
+//            FileOutputStream output = null;
+//            try {
+//                file = new File("/tmp/frc_versions/FRC_Lib_Version.ini");
+//
+//                if (file.exists())
+//                	file.delete();
+//
+//                file.createNewFile();
+//
+//                output = new FileOutputStream(file);
+//
+//				output.write("2015 Java 1.0.0".getBytes());
+//
+//            } catch (IOException ex) {
+//                ex.printStackTrace();
+//            } finally {
+//                if (output != null) {
+//                    try {
+//                        output.close();
+//                    } catch (IOException ex) {
+//                    }
+//                }
+//            }
+//
+//		boolean errorOnExit = false;
+//		try {
+//			robot.startCompetition();
+//		} catch (Throwable t) {
+//			DriverStation.reportError("ERROR Unhandled exception: " + t.toString() + " at " + Arrays.toString(t.getStackTrace()), false);
+//			errorOnExit = true;
+//		} finally {
+//			// startCompetition never returns unless exception occurs....
+//			System.err.println("WARNING: Robots don't quit!");
+//			if (errorOnExit) {
+//				System.err.println("---> The startCompetition() method (or methods called by it) should have handled the exception above.");
+//			} else {
+//				System.err.println("---> Unexpected return from startCompetition() method.");
+//			}
+//		}
+//		System.exit(1);
+//	}
 }
