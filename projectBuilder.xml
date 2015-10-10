@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="RRB4J.makejar" default="makejar" basedir=".">
+	
+	<property name="ftp-server" value="10.7.66.3" />
+	<property name="ftp-userid" value="pi" />
+	<property name="ftp-password" value="raspberry" />
+	<property name="ftp-remotedir" value="home/pi/" />
+	
+	<target name="makejar" description="Create a jar for the RRB4J project">
+		<echo message="Compiling jar file"/>
+		<jar jarfile="RRB4J.jar" includes="*.class" basedir="bin" />
+		 <antcall target="ftp"></antcall>
+	</target>
+	
+	<target name="ftp" description="upload file to raspberry pi" >
+		<echo message="FTPing file to raspberry pi"/>
+		<ftp server="${ftp-server}" remotedir="${ftp-remotedir}" userid="${ftp-userid}" password="${ftp-password}" action="mkdir" verbose="yes">
+		</ftp>
+		<ftp server="${ftp-server}" remotedir="${ftp-remotedir}" userid="${ftp-userid}" password="${ftp-password}" action="send" verbose="yes" depends="yes">
+			<fileset file="${build-directory}/${project-name}.jar" />
+		</ftp>
+	</target>
+</project>
