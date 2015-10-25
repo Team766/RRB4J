@@ -184,11 +184,37 @@ public abstract class RobotBase {
 	 * Starting point for the applications.
 	 */
 	public static void main(String args[]){
+		String robotName = "";
+		Enumeration<URL> resources = null;
+		try {
+			resources = RobotBase.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+		} catch (IOException e) {e.printStackTrace();}
+		while (resources != null && resources.hasMoreElements()) {
+			try {
+				Manifest manifest = new Manifest(resources.nextElement().openStream());
+				robotName = manifest.getMainAttributes().getValue("Robot-Class");
+			} catch (IOException e) {e.printStackTrace();}
+		}
+		System.out.println("Robot Name: " + robotName);
+
+		RobotBase robot;
+		try {
+			robot = (RobotBase) Class.forName(robotName).newInstance();
+			System.out.println("SUCCESS");
+		} catch (Throwable t) {
+			System.err.println("WARNING: Robots don't quit!");
+			System.err.println("ERROR: Could not instantiate robot " + robotName + "!");
+			System.exit(1);
+			return;
+		}
+		System.out.println("DONE");
+		
 		RRB4J.getInstance().set_led1(true);
 		Robot robert = new Robot();
 		
 		System.out.println(fileName);
 		
+		//For testing, move to startCompetition() method when working
 		RobotState _state = RobotState.INIT;
 		for(int i = 0; i < RobotState.values().length; i++){
 			switch(_state){
