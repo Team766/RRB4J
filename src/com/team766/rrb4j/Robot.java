@@ -1,11 +1,15 @@
 package com.team766.rrb4j;
 
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Talon;
 
 public class Robot extends SampleRobot {
     Talon left;
     Talon right;
+    
+    Encoder leftEnc;
+    Encoder rightEnc;
     
 	public Robot(){
 		
@@ -16,6 +20,9 @@ public class Robot extends SampleRobot {
 		
 		left = new Talon(0);
 	    right = new Talon(1);
+	    
+	    leftEnc = new Encoder(0,0);
+	    rightEnc = new Encoder(1,1);
 	}
 	
 	public void disabled(){
@@ -24,6 +31,14 @@ public class Robot extends SampleRobot {
 	
 	public void autonomous() {
 		System.out.println("Basic Robot: Auton Controlled!");
+		
+		//Drive forward 60 inches
+		while((leftEnc.getDistance() + rightEnc.getDistance()) / 2 <= 60){
+			left.set(0.5);
+			right.set(0.5);
+		}
+		left.set(0);
+		right.set(0);
     }
 	
 	public void operatorControl() {

@@ -108,6 +108,8 @@ public abstract class RobotBase {
 	 */
 	public abstract void startCompetition();
 
+	 protected void prestart() {
+	 }
 
 	public static boolean getBooleanProperty(String name, boolean defaultValue) {
 		String propVal = System.getProperty(name);

@@ -215,4 +215,12 @@ public class RRB4J{
         float finish = System.nanoTime() * 1e-9f;
         return (finish - start) / 0.000058f;
     }
+    
+    //Encoders
+    public int getLeftEncoder(){
+    	return 0;
+    }
+    public int getRightEncoder(){
+    	return 0;
+    }
 }
