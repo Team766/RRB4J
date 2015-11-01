@@ -7,27 +7,13 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.jar.Manifest;
-import java.util.Arrays;
-
 import com.team766.rrb4j.RRB4J;
 import com.team766.rrb4j.Robot;
+import com.team766.rrb4j.VRConnector;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.internal.HardwareHLUsageReporting;
 import edu.wpi.first.wpilibj.internal.HardwareTimer;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.Utility;
 
 /**
  * Implement a Robot Program framework.
@@ -47,8 +33,6 @@ public abstract class RobotBase {
 	public enum RobotState {
         DISABLED, AUTONOMOUS, INIT, TELEOP
     }
-
-//	protected final DriverStation m_ds;
 
 	/**
 	 * Constructor for a generic robot program.
@@ -184,106 +168,29 @@ public abstract class RobotBase {
 	 * Starting point for the applications.
 	 */
 	public static void main(String args[]){
-		RRB4J.getInstance().set_led1(true);
+		if(!VRConnector.SIMULATOR)
+			RRB4J.getInstance().set_led1(true);
+		else
+			startSimulator();
+		
 		Robot robert = new Robot();
 		
-		System.out.println(fileName);
+		robert.startCompetition();
+
+		if(!VRConnector.SIMULATOR)
+			RRB4J.getInstance().set_led1(false);
 		
-		RobotState _state = RobotState.INIT;
-		for(int i = 0; i < RobotState.values().length; i++){
-			switch(_state){
-				case AUTONOMOUS:
-					robert.autonomous();
-					_state = RobotState.TELEOP;
-					break;
-				case DISABLED:
-					robert.disabled();
-					_state = RobotState.AUTONOMOUS;
-					break;
-				case INIT:
-					robert.robotInit();
-					_state = RobotState.DISABLED;
-					break;
-				case TELEOP:
-					robert.operatorControl();
-					_state = RobotState.DISABLED;
-					break;
-				default:
-					break;
-			}
-		}
-		RRB4J.getInstance().set_led1(false);
+		System.exit(1);
 	}
 	
-//	public static void main(String args[]) {
-//		initializeHardwareConfiguration();
-//
-//		UsageReporting.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
-//
-//		String robotName = "";
-//		Enumeration<URL> resources = null;
-//		try {
-//			resources = RobotBase.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
-//		} catch (IOException e) {e.printStackTrace();}
-//		while (resources != null && resources.hasMoreElements()) {
-//			try {
-//				Manifest manifest = new Manifest(resources.nextElement().openStream());
-//				robotName = manifest.getMainAttributes().getValue("Robot-Class");
-//			} catch (IOException e) {e.printStackTrace();}
-//		}
-//
-//		RobotBase robot;
-//		try {
-//			robot = (RobotBase) Class.forName(robotName).newInstance();
-//			robot.prestart();
-//		} catch (Throwable t) {
-//			DriverStation.reportError("ERROR Unhandled exception instantiating robot " + robotName + " " + t.toString() + " at " + Arrays.toString(t.getStackTrace()), false);
-//			System.err.println("WARNING: Robots don't quit!");
-//			System.err.println("ERROR: Could not instantiate robot " + robotName + "!");
-//			System.exit(1);
-//			return;
-//		}
-//		
-//		File file = null;
-//            FileOutputStream output = null;
-//            try {
-//                file = new File("/tmp/frc_versions/FRC_Lib_Version.ini");
-//
-//                if (file.exists())
-//                	file.delete();
-//
-//                file.createNewFile();
-//
-//                output = new FileOutputStream(file);
-//
-//				output.write("2015 Java 1.0.0".getBytes());
-//
-//            } catch (IOException ex) {
-//                ex.printStackTrace();
-//            } finally {
-//                if (output != null) {
-//                    try {
-//                        output.close();
-//                    } catch (IOException ex) {
-//                    }
-//                }
-//            }
-//
-//		boolean errorOnExit = false;
-//		try {
-//			robot.startCompetition();
-//		} catch (Throwable t) {
-//			DriverStation.reportError("ERROR Unhandled exception: " + t.toString() + " at " + Arrays.toString(t.getStackTrace()), false);
-//			errorOnExit = true;
-//		} finally {
-//			// startCompetition never returns unless exception occurs....
-//			System.err.println("WARNING: Robots don't quit!");
-//			if (errorOnExit) {
-//				System.err.println("---> The startCompetition() method (or methods called by it) should have handled the exception above.");
-//			} else {
-//				System.err.println("---> Unexpected return from startCompetition() method.");
-//			}
-//		}
-//		System.exit(1);
-//	}
+	private static void startSimulator(){
+		VRConnector.getInstance();
+		
+		try{
+			Thread.sleep(1000);
+		}catch(InterruptedException e){}
+		
+		new Thread(VRConnector.getInstance()).start();
+	}
 }
+	

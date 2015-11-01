@@ -30,8 +30,8 @@ public class Robot extends SampleRobot {
         System.out.println("Basic Robot: Operator Controlled!");
         
         //Set Motors Forward
-        left.set(1);
-        right.set(-1);
+        left.set(0.5);
+        right.set(0.5);
         
         //Wait
         try {
@@ -39,10 +39,9 @@ public class Robot extends SampleRobot {
 		} catch (InterruptedException e) {
 			System.out.println("The coffee was not decafe!!!!  Failed to SLEEP!!!!");
 		}
-        
       //Set Motors Backwards
-        left.set(-1);
-        right.set(1);
+        left.set(-0.5);
+        right.set(-0.5);
         
         //Wait
         try {

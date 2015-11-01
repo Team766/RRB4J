@@ -11,6 +11,7 @@ import java.nio.ByteOrder;
 import java.nio.ByteBuffer;
 
 import com.team766.rrb4j.RRB4J;
+import com.team766.rrb4j.VRConnector;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
@@ -305,11 +306,18 @@ public class PWM extends SensorBase implements LiveWindowSendable {
 
 		//Turn -1 - 1 into 0 - 100
 		
-		if(getChannel() == 0)
-			RRB4J.getInstance().setLeftMotor(Math.abs((int)(speed * 100d)), speed < 0);
-		else if(getChannel() == 1)
-			RRB4J.getInstance().setRightMotor(Math.abs((int)(speed * 100d)), speed < 0);
-		else
+		if(getChannel() == 0){
+			if(!VRConnector.SIMULATOR)
+				RRB4J.getInstance().setLeftMotor(Math.abs((int)(speed * 100d)), speed < 0);
+			else
+				VRConnector.getInstance().putCommandFloat(VRConnector.LEFT_MOTOR, (float)speed * 512f);
+		}
+		else if(getChannel() == 1){
+			if(!VRConnector.SIMULATOR)
+				RRB4J.getInstance().setRightMotor(Math.abs((int)(speed * 100d)), speed < 0);
+			else
+				VRConnector.getInstance().putCommandFloat(VRConnector.RIGHT_MOTOR, (float)speed * 512f);
+		}else
 			System.err.println("WRONG TALON PORT,  silly");
 	}
 
