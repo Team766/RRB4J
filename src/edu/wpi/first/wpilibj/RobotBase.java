@@ -34,24 +34,6 @@ public abstract class RobotBase {
         DISABLED, AUTONOMOUS, INIT, TELEOP
     }
 
-	/**
-	 * Constructor for a generic robot program.
-	 * User code should be placed in the constructor that runs before the Autonomous or Operator
-	 * Control period starts. The constructor will run to completion before Autonomous is entered.
-	 *
-	 * This must be used to ensure that the communications code starts. In the future it would be
-	 * nice to put this code into it's own task that loads on boot so ensure that it runs.
-//	 */
-//	protected RobotBase() {
-//		// TODO: StartCAPI();
-//		// TODO: See if the next line is necessary
-//		// Resource.RestartProgram();
-//
-//		NetworkTable.setServerMode();//must be before b
-//		m_ds = DriverStation.getInstance();
-//		NetworkTable.getTable("");  // forces network tables to initialize
-//		NetworkTable.getTable("LiveWindow").getSubTable("~STATUS~").putBoolean("LW Enabled", false);
-//	}
 
 	/**
 	 * Free the resources for a RobotBase class.
@@ -126,17 +108,6 @@ public abstract class RobotBase {
 	 */
 	public abstract void startCompetition();
 
-	/**
-	 * This hook is called right before startCompetition(). By default, tell the
-	 * DS that the robot is now ready to be enabled. If you don't want for the
-	 * robot to be enabled yet, you can override this method to do nothing.
-	 * If you do so, you will need to call 
-	 * FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationOvserveUserProgramStarting() from
-	 * your code when you are ready for the robot to be enabled.
-	 */
-	protected void prestart() {
-		FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
-	}
 
 	public static boolean getBooleanProperty(String name, boolean defaultValue) {
 		String propVal = System.getProperty(name);
@@ -172,7 +143,7 @@ public abstract class RobotBase {
 			RRB4J.getInstance().set_led1(true);
 		else
 			startSimulator();
-		
+	
 		Robot robert = new Robot();
 		
 		robert.startCompetition();
