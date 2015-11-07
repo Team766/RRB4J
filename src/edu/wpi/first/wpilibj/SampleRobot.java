@@ -114,7 +114,7 @@ public class SampleRobot extends RobotBase {
 	private void resetField(){
 		if(!VRConnector.SIMULATOR)
 			return;
-		
+
 		VRConnector.getInstance().putCommandBool(VRConnector.RESET_SIM, true);
 	}
 	/**

@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.io.IOException;
+
 import com.team766.rrb4j.RRB4J;
 import com.team766.rrb4j.Robot;
 import com.team766.rrb4j.VRConnector;
@@ -149,7 +151,7 @@ public abstract class RobotBase {
 		Robot robert = new Robot();
 		
 		robert.startCompetition();
-
+		
 		if(!VRConnector.SIMULATOR)
 			RRB4J.getInstance().set_led1(false);
 		
@@ -158,7 +160,6 @@ public abstract class RobotBase {
 	
 	private static void startSimulator(){
 		VRConnector.getInstance();
-		
 		try{
 			Thread.sleep(1000);
 		}catch(InterruptedException e){}

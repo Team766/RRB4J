@@ -310,13 +310,13 @@ public class PWM extends SensorBase implements LiveWindowSendable {
 			if(!VRConnector.SIMULATOR)
 				RRB4J.getInstance().setLeftMotor(Math.abs((int)(speed * 100d)), speed < 0);
 			else
-				VRConnector.getInstance().putCommandFloat(VRConnector.LEFT_MOTOR, (float)speed * 512f);
+				VRConnector.getInstance().putCommandFloat(VRConnector.LEFT_MOTOR, (float)speed);
 		}
 		else if(getChannel() == 1){
 			if(!VRConnector.SIMULATOR)
 				RRB4J.getInstance().setRightMotor(Math.abs((int)(speed * 100d)), speed < 0);
 			else
-				VRConnector.getInstance().putCommandFloat(VRConnector.RIGHT_MOTOR, (float)speed * 512f);
+				VRConnector.getInstance().putCommandFloat(VRConnector.RIGHT_MOTOR, (float)speed);
 		}else
 			System.err.println("WRONG TALON PORT,  silly");
 	}

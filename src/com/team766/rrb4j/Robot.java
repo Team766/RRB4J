@@ -67,7 +67,7 @@ public class Robot extends SampleRobot {
         
         //Stop Motors
         left.set(0);
-        right.set(0);
+        right.set(0);        
     }
 	
 }

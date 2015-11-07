@@ -178,7 +178,13 @@ public class Encoder extends SensorBase implements PIDSource {
 	 * @return The current rate of the encoder.
 	 */
 	public double getRate() {
-		return getRaw() - getRaw();
+		double old = getRaw();
+		try {
+			Thread.sleep(10);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return getRaw() - old;
 	}
 
 	/**
