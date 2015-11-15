@@ -29,14 +29,6 @@ public abstract class SolenoidBase extends SensorBase {
      * @param moduleNumber The PCM CAN ID
      */
     public SolenoidBase(final int moduleNumber) {
-        m_moduleNumber = moduleNumber;
-        m_ports = new ByteBuffer[SensorBase.kSolenoidChannels];
-        for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
-            ByteBuffer port = SolenoidJNI.getPortWithModule((byte) moduleNumber, (byte) i);
-            IntBuffer status = IntBuffer.allocate(1);
-            m_ports[i] = SolenoidJNI.initializeSolenoidPort(port, status);
-            HALUtil.checkStatus(status);
-        }
     }
 
     /**

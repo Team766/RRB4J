@@ -114,8 +114,12 @@ public class SampleRobot extends RobotBase {
 	private void resetField(){
 		if(!VRConnector.SIMULATOR)
 			return;
-
+		
 		VRConnector.getInstance().putCommandBool(VRConnector.RESET_SIM, true);
+		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {}
 	}
 	/**
 	 * Start a competition. This code tracks the order of the field starting to

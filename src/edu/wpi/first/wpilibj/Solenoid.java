@@ -7,19 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
-import edu.wpi.first.wpilibj.hal.HALUtil;
-import edu.wpi.first.wpilibj.hal.SolenoidJNI;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
-import edu.wpi.first.wpilibj.util.AllocationException;
-import edu.wpi.first.wpilibj.util.CheckedAllocationException;
+import com.team766.rrb4j.VRConnector;
 
 /**
  * Solenoid class for running high voltage Digital Output.
@@ -27,28 +15,12 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
  * The Solenoid class is typically used for pneumatics solenoids, but could be used
  * for any device within the current spec of the PCM.
  */
-public class Solenoid extends SolenoidBase implements LiveWindowSendable {
+public class Solenoid extends SolenoidBase {
 
-    private int m_channel; ///< The channel to control.
-    private ByteBuffer m_solenoid_port;
+    private boolean isIntake = false;
+    private boolean isFire = false;
+    private boolean currState;
 
-    /**
-     * Common function to implement constructor behavior.
-     */
-    private synchronized void initSolenoid() {
-        checkSolenoidModule(m_moduleNumber);
-        checkSolenoidChannel(m_channel);
-
-		ByteBuffer status = ByteBuffer.allocateDirect(4);
-		status.order(ByteOrder.LITTLE_ENDIAN);
-
-        ByteBuffer port = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
-        m_solenoid_port = SolenoidJNI.initializeSolenoidPort(port, status.asIntBuffer());
-        HALUtil.checkStatus(status.asIntBuffer());
-
-        LiveWindow.addActuator("Solenoid", m_moduleNumber, m_channel, this);
-        UsageReporting.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber);
-    }
 
     /**
      * Constructor using the default PCM ID (0)
@@ -56,28 +28,20 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
      * @param channel The channel on the PCM to control.
      */
     public Solenoid(final int channel) {
-        super(getDefaultSolenoidModule());
-        m_channel = channel;
-        initSolenoid();
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param moduleNumber The CAN ID of the PCM the solenoid is attached to.
-     * @param channel The channel on the PCM to control (0..7).
-     */
-    public Solenoid(final int moduleNumber, final int channel) {
-        super(moduleNumber);
-        m_channel = channel;
-        initSolenoid();
+    	super(channel);
+    	
+    	if(VRConnector.SIMULATOR){
+	    	if(channel == 0)
+	    		isIntake = true;
+	    	else if(channel == 1)
+	    		isFire = true;
+    	}
     }
 
     /**
      * Destructor.
      */
     public synchronized void free() {
-  //      m_allocated.free((m_moduleNumber - 1) * kSolenoidChannels + m_channel - 1);
     }
 
     /**
@@ -86,10 +50,14 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
      * @param on Turn the solenoid output off or on.
      */
     public void set(boolean on) {
-        byte value = (byte) (on ? 0xFF : 0x00);
-        byte mask = (byte) (1 << m_channel);
-
-    	set(value, mask);
+       currState = on;
+       if(isIntake)
+    	   VRConnector.getInstance().putCommandBool(VRConnector.INTAKE, on);
+       else if(isFire){
+    	   VRConnector.getInstance().putCommandBool(VRConnector.LAUNCH, on);
+    	   //Reset after firing
+    	   currState = false;
+       }
     }
 
     /**
@@ -98,74 +66,6 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
      * @return The current value of the solenoid.
      */
     public boolean get() {
-        int value = getAll() & ( 1 << m_channel);
-        return (value != 0);
-    }
-	/**
-	 * Check if solenoid is blacklisted.
-	 *		If a solenoid is shorted, it is added to the blacklist and
-	 *		disabled until power cycle, or until faults are cleared.
-	 *		@see clearAllPCMStickyFaults()
-	 *
-	 * @return If solenoid is disabled due to short.
-	 */
-	public boolean isBlackListed() {
-		int value = getPCMSolenoidBlackList() & ( 1 << m_channel);
-		return (value != 0);
-	}
-    /*
-     * Live Window code, only does anything if live window is activated.
-     */
-    public String getSmartDashboardType() {
-        return "Solenoid";
-    }
-    private ITable m_table;
-    private ITableListener m_table_listener;
-
-    /**
-     * {@inheritDoc}
-     */
-    public void initTable(ITable subtable) {
-        m_table = subtable;
-        updateTable();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public ITable getTable() {
-        return m_table;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void updateTable() {
-        if (m_table != null) {
-            m_table.putBoolean("Value", get());
-        }
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    public void startLiveWindowMode() {
-        set(false); // Stop for safety
-        m_table_listener = new ITableListener() {
-            public void valueChanged(ITable itable, String key, Object value, boolean bln) {
-                set(((Boolean) value).booleanValue());
-            }
-        };
-        m_table.addTableListener("Value", m_table_listener, true);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void stopLiveWindowMode() {
-        set(false); // Stop for safety
-        // TODO: Broken, should only remove the listener from "Value" only.
-        m_table.removeTableListener(m_table_listener);
+        return currState;
     }
 }

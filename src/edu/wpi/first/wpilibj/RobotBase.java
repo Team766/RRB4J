@@ -159,11 +159,6 @@ public abstract class RobotBase {
 	}
 	
 	private static void startSimulator(){
-		VRConnector.getInstance();
-		try{
-			Thread.sleep(1000);
-		}catch(InterruptedException e){}
-		
 		new Thread(VRConnector.getInstance()).start();
 	}
 }

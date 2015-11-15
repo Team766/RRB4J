@@ -6,6 +6,8 @@
 /*----------------------------------------------------------------------------*/
 package edu.wpi.first.wpilibj;
 
+import java.io.IOException;
+
 import com.team766.rrb4j.RRB4J;
 import com.team766.rrb4j.VRConnector;
 
@@ -52,6 +54,8 @@ public class Encoder extends SensorBase implements PIDSource {
 			System.err.println("There is no more encoders...Use 0 or 1");
 			IGNORE = true;
 		}
+		
+		reset();
 	}
 
 
